@@ -16,7 +16,6 @@ export default (httpServer) => {
       addPlayer(socket.id);
       io.emit('getUsers', getUsers());
     } else {
-      io.to(socket.id).emit('game-full');
       console.log('game-full');
     }
 
@@ -24,12 +23,13 @@ export default (httpServer) => {
       socket.to(socketId).emit('recieveGameData', { word, paths, score });
     });
 
-    socket.on('disconnect', () => {
-      removePlayer(socket.id);
-      io.emit('userDisconnected', socket.id);
-      io.emit('getUsers', getUsers());
+    socket.on('sendGameEnded', (socketId) => {
+      socket.to(socketId).emit('recieveGameEnded');
     });
 
-    console.log(getUsers());
+    socket.on('disconnect', () => {
+      removePlayer(socket.id);
+      io.emit('getUsers', getUsers());
+    });
   });
 };
